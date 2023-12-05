@@ -1,0 +1,42 @@
+service: Topic
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    ACCESS_KEY: ${process.env.ACCESS_KEY}
+    SECRET_KEY: ${process.env.SECRET_KEY}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:CreateTopic
+        - sns:SetTopicAttributes
+        - sns:ListTopics
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - sqs:CreateQueue
+        - sqs:SetQueueAttributes
+      Resource: "*"
+
+functions:
+  sns-handler:
+    handler: SNS.handler
+    events:
+      - httpApi:
+          path: /sns
+          method: get
+      - httpApi:
+          path: /sns
+          method: post
+
+  sqs-handler:
+    handler: SQS.handler
+    events:
+      - httpApi:
+          path: /sqs
+          method: get
+      - httpApi:
+          path: /sqs
+          method: post
